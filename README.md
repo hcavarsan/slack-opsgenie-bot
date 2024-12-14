@@ -68,6 +68,7 @@ Before starting, ensure you have:
 
 Create the `.env.yaml` file with the following content:
 
+
 ```yaml
 OPSGENIE_API_KEY: "your-api-key"
 OPSGENIE_TEAM_ID: "your-team-id"
@@ -85,7 +86,8 @@ git clone https://github.com/hcavarsan/slack-opsgenie-bot
 cd slack-opsgenie-bot
 pnpm install
 
-# Add your credentials to .env file
+# Add your credentials to .env.yaml file
+cp .env.yaml.example .env.yaml
 
 # Build and run
 pnpm docker:build
@@ -95,8 +97,6 @@ pnpm docker:run
 
 #### Using Google Cloud Functions
 ```bash
-# After cloning and installing (steps above)
-# Convert your .env to .env.yaml format
 
 # Deploy
 gcloud functions deploy slack-opsgenie-bot \
@@ -117,7 +117,7 @@ gcloud functions deploy slack-opsgenie-bot \
 #### A. Using Slack (Production)
 1. In any Slack channel, type:
    ```
-   /create-incident
+   /$SLASH_COMMAND_NAME
    ```
 2. Fill in the incident details in the modal
 3. Submit to create an OpsGenie alert
@@ -153,27 +153,6 @@ Requirements:
 - `curl` installed on your system
 - `jq` installed for JSON parsing
 
-
-## Development
-
-```bash
-# Local development with hot reload
-pnpm dev
-
-# Run tests
-pnpm test
-
-# Build
-pnpm build
-```
-
-## Need Help?
-- Open an issue in the repository
-
-## License
-
-MIT License
-
 ### Priority Mapping
 
 The incident priorities map to OpsGenie priorities as follows:
@@ -184,4 +163,14 @@ The incident priorities map to OpsGenie priorities as follows:
 | High           | P2               |
 | Medium         | P3               |
 | Low            | P4               |
+
+
+
+## Need Help?
+- Open an issue in the repository
+
+## License
+
+MIT License
+
 
