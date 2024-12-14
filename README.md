@@ -66,19 +66,8 @@ Before starting, ensure you have:
 
 ### 3. Environment Configuration
 
-Create the following environment files:
+Create the `.env.yaml` file with the following content:
 
-#### `.env` (for local development)
-```bash
-OPSGENIE_API_KEY=your-api-key
-OPSGENIE_TEAM_ID=your-team-id
-OPSGENIE_DOMAIN=your-domain
-SLACK_API_URL=https://slack.com/api
-SLACK_BOT_TOKEN=xoxb-your-bot-token
-SLACK_SIGNING_SECRET=your-signing-secret
-```
-
-#### `.env.yaml` (for Cloud Functions)
 ```yaml
 OPSGENIE_API_KEY: "your-api-key"
 OPSGENIE_TEAM_ID: "your-team-id"
@@ -96,8 +85,6 @@ git clone https://github.com/hcavarsan/slack-opsgenie-bot
 cd slack-opsgenie-bot
 pnpm install
 
-# Configure environment
-cp .env.example .env
 # Add your credentials to .env file
 
 # Build and run
