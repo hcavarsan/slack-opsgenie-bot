@@ -1,18 +1,23 @@
 {
 	"compilerOptions": {
-	  "target": "es2018",
-	  "module": "commonjs",
-	  "outDir": "dist",
-	  "rootDir": "src",
-	  "strict": true,
+	  "target": "es2022",
+	  "module": "ES2022",
+	  "moduleResolution": "node",
+	  "outDir": "./dist",
+	  "rootDir": "./src",
 	  "esModuleInterop": true,
+	  "allowJs": true,
+	  "declaration": true,
+	  "strict": true,
 	  "skipLibCheck": true,
-	  "forceConsistentCasingInFileNames": true,
-	  "resolveJsonModule": true,
 	  "baseUrl": ".",
 	  "paths": {
 		"@/*": ["src/*"]
-	  }
+	  },
+	  "types": ["node", "express", "express-serve-static-core", "qs"],
+	  "typeRoots": ["./node_modules/@types", "./src/types"],
+	  "sourceMap": true,
+	  "removeComments": false
 	},
 	"include": ["src/**/*"],
 	"exclude": ["node_modules", "dist"]

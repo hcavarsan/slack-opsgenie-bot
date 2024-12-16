@@ -62,7 +62,10 @@ print_header "Testing /create-incident Command"
 
 echo "Generating test request..."
 TIMESTAMP=$(date +%s)
-BODY="command=/create-incident&text=Test Incident&user_id=U2147483697&user_name=test.user&user_email=test@example.com&team_domain=example&channel_id=C2147483705&channel_name=test-channel"
+TRIGGER_ID="test_trigger_id"
+
+echo "Generating test request..."
+BODY="command=/create-incident&text=Test Incident&user_id=U2147483697&user_name=test.user&user_email=test@example.com&team_domain=example&channel_id=C2147483705&channel_name=test-channel&trigger_id=${TRIGGER_ID}"
 SIGNING_STRING="v0:${TIMESTAMP}:${BODY}"
 SIGNATURE="v0=$(echo -n "$SIGNING_STRING" | openssl sha256 -hmac "$SLACK_SIGNING_SECRET" | cut -d' ' -f2)"
 
@@ -88,53 +91,48 @@ print_header "Testing Interactivity Endpoint"
 
 echo "Generating test modal submission..."
 MODAL_PAYLOAD='{
-    "payload": {
-        "type": "view_submission",
-        "team": {
-            "id": "T0001",
-            "domain": "example"
-        },
-        "user": {
-            "id": "U2147483697",
-            "username": "test.user",
-            "name": "Test User",
-            "team_id": "T0001",
-            "email": "test@example.com"
-        },
-        "api_app_id": "A123456",
-        "token": "verification_token",
-        "trigger_id": "12345.98765.abcd2345",
-        "view": {
-            "id": "V123456",
-            "team_id": "T0001",
-            "type": "modal",
-            "private_metadata": "{\"channelId\":\"C2147483705\",\"channelName\":\"test-channel\",\"teamDomain\":\"example\"}",
-            "callback_id": "incident_modal",
-            "state": {
-                "values": {
-                    "title_block": {
-                        "title": {
-                            "type": "plain_text_input",
-                            "value": "Test Incident Title"
-                        }
-                    },
-                    "description_block": {
-                        "description": {
-                            "type": "plain_text_input",
-                            "value": "This is a test incident description with proper length and format."
-                        }
-                    },
-                    "urgency_block": {
-                        "urgency": {
-                            "type": "static_select",
-                            "selected_option": {
-                                "text": {
-                                    "type": "plain_text",
-                                    "text": "High",
-                                    "emoji": true
-                                },
-                                "value": "high"
-                            }
+    "type": "view_submission",
+    "team": {
+        "id": "T0001",
+        "domain": "example"
+    },
+    "user": {
+        "id": "U2147483697",
+        "username": "test.user",
+        "name": "Test User",
+        "email": "test@example.com"
+    },
+    "trigger_id": "'${TRIGGER_ID}'",
+    "view": {
+        "id": "V123456",
+        "team_id": "T0001",
+        "type": "modal",
+        "private_metadata": "{\"channelId\":\"C2147483705\",\"channelName\":\"test-channel\",\"teamDomain\":\"example\"}",
+        "callback_id": "incident_modal",
+        "state": {
+            "values": {
+                "title_block": {
+                    "title": {
+                        "type": "plain_text_input",
+                        "value": "Test Incident Title"
+                    }
+                },
+                "description_block": {
+                    "description": {
+                        "type": "plain_text_input",
+                        "value": "This is a test incident description"
+                    }
+                },
+                "urgency_block": {
+                    "urgency": {
+                        "type": "static_select",
+                        "selected_option": {
+                            "text": {
+                                "type": "plain_text",
+                                "text": "High",
+                                "emoji": true
+                            },
+                            "value": "high"
                         }
                     }
                 }
@@ -151,6 +149,7 @@ echo -e "  ${BLUE}Method:${NC} POST"
 SIGNING_STRING="v0:${TIMESTAMP}:${MODAL_PAYLOAD}"
 MODAL_SIGNATURE="v0=$(echo -n "$SIGNING_STRING" | openssl sha256 -hmac "$SLACK_SIGNING_SECRET" | cut -d' ' -f2)"
 
+# Send the modal submission and wait for response
 RESPONSE=$(curl -s -X POST "http://localhost:8080/slack/interactivity" \
     -H "Content-Type: application/json" \
     -H "X-Slack-Request-Timestamp: $TIMESTAMP" \
@@ -160,20 +159,32 @@ RESPONSE=$(curl -s -X POST "http://localhost:8080/slack/interactivity" \
 if [ $? -eq 0 ]; then
     print_success "Modal submission sent successfully"
 
-    # Extract response data
-    if echo "$RESPONSE" | grep -q "OpsGenie Error"; then
-        print_warning "OpsGenie integration returned an error"
-        echo -e "Response: $RESPONSE"
+    # Wait for a moment to allow the incident to be created
+    echo "Waiting for incident creation..."
+    sleep 3
+
+    # Get the latest alert from OpsGenie
+    LATEST_ALERT=$(curl -s -X GET "https://api.opsgenie.com/v2/alerts?query=alias:%20slack-incident-U2147483697-*&limit=1&sort=createdAt&order=desc" \
+        -H "Authorization: GenieKey $OPSGENIE_API_KEY" \
+        -H "Content-Type: application/json")
+
+    if [ $? -eq 0 ] && [ -n "$LATEST_ALERT" ]; then
+        INCIDENT_ID=$(echo "$LATEST_ALERT" | jq -r '.data[0].id')
+        INCIDENT_TINY_ID=$(echo "$LATEST_ALERT" | jq -r '.data[0].tinyId')
+        INCIDENT_URL="https://${OPSGENIE_DOMAIN}.app.opsgenie.com/alert/detail/${INCIDENT_ID}/details"
+
+        print_success "Incident created successfully"
+
+        echo -e "\n┌────────────────────────────────────────┐"
+        echo -e "│         🔔 Incident Details            │"
+        echo -e "├────────────────────────────────────────┤"
+        echo -e "│  ID:      ${BLUE}${INCIDENT_TINY_ID}${NC}"
+        echo -e "│  Status:  ${GREEN}OPEN${NC}"
+        echo -e "│  URL:     ${BLUE}${INCIDENT_URL}${NC}"
+        echo -e "└────────────────────────────────────────┘"
     else
-        # Extract URL from response
-        INCIDENT_URL=$(echo "$RESPONSE" | jq -r '.url // .links.web // empty')
-        if [ -n "$INCIDENT_URL" ]; then
-            print_success "Incident created successfully"
-            echo -e "${BLUE}Incident URL:${NC} $INCIDENT_URL"
-        else
-            print_warning "Incident created but URL not available yet"
-            echo -e "Response: $RESPONSE"
-        fi
+        print_warning "Could not fetch incident details"
+        echo "Response from OpsGenie: $LATEST_ALERT"
     fi
 else
     print_error "Failed to send modal submission"
@@ -192,8 +203,6 @@ echo -e "│  ❌ Failed:    ${RED}$FAILED_TESTS${NC}                    │"
 echo -e "└────────────────────────────────────────┘"
 
 if [ -n "$INCIDENT_URL" ]; then
-    # Format URL to fit in box
-    FORMATTED_URL=$(echo $INCIDENT_URL | sed 's/\(.\{45\}\).*/\1.../')
     echo -e "\n┌────────────────────────────────────────┐"
     echo -e "│         🔔 Incident Created           │"
     echo -e "├────────────────────────────────────────┤"

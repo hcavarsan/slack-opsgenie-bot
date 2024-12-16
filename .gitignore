@@ -22,5 +22,5 @@ test
 *.test.ts
 .env.*
 !.env.yaml.example
-
+package-lock.json
 .env.yaml
