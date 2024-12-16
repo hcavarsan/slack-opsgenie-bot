@@ -2,7 +2,8 @@
 
 Create OpsGenie alerts directly from Slack using a simple slash command. This integration allows teams to quickly create incidents through Slack.
 
-![Demo]([https://s7.gifyu.com/images/SJPdM.gif](https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWVjdjE2eXI3bmlxend0Ynpva2VrZ2dwdmk4ZzBub2x0b3UwaWFwZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/uQ2cEQBEuez4jZnAmj/giphy.gif))
+![demo 5](https://github.com/user-attachments/assets/faa6d2c8-eeee-4fbf-a942-53584d3b5e2c)
+
 
 ## Why This Bot?
 
