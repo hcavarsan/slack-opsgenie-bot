@@ -15,23 +15,11 @@ oauth_config:
     user:
       - chat:write
       - im:write
-      - users:read
-      - users:read.email
-      - channels:read
-      - channels:write
-      - groups:write
-      - mpim:write
     bot:
-      - channels:read
       - chat:write
       - commands
       - im:write
       - users:read
-      - users:read.email
-      - channels:manage
-      - groups:write
-      - mpim:write
-      - incoming-webhook
 settings:
   interactivity:
     is_enabled: true

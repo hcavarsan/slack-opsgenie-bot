@@ -2,8 +2,7 @@
 
 Create OpsGenie alerts directly from Slack using a simple slash command. This integration allows teams to quickly create incidents through Slack.
 
-![demo 5](https://github.com/user-attachments/assets/faa6d2c8-eeee-4fbf-a942-53584d3b5e2c)
-
+![Demo](https://s7.gifyu.com/images/SJPdM.gif)
 
 ## Why This Bot?
 
@@ -65,38 +64,33 @@ Required Permissions:
 - ✅ Write Access (for creating/updating incidents)
 - ✅ Configure Access (for integration management)
 
-
 ### 2. Slack App Creation
 
 The Slack integration consists of a custom app that provides the interface between your team and OpsGenie. You can create this app in two ways:
 
 #### Option 1: Manual Setup (UI-based)
 
-The Slack integration consists of a custom app that provides the interface between your team and OpsGenie. Create this app at [Slack API Apps](https://api.slack.com/apps).
+Create a new app at [Slack API Apps](https://api.slack.com/apps).
 
-Start by creating a new app from scratch, naming it "OpsGenie Incident Bot". This will be the interface your team uses to create  incidents.
-
-#### Security and Permissions
-Under the Basic Information section, you'll find your app's credentials. The Signing Secret is particularly important as it ensures secure communication between Slack and your integration.
-
-Navigate to OAuth & Permissions to configure the bot's capabilities. The integration requires specific permissions to function properly:
+#### Required Permissions
+Navigate to OAuth & Permissions to configure these essential scopes:
 
 Bot Token Scopes:
 ```
-channels:read, chat:write, commands, im:write, users:read,
-users:read.email, channels:manage, groups:write, mpim:write, incoming-webhook
+chat:write    - Send messages as the bot
+commands      - Create slash commands
+im:write      - Send direct messages
+users:read    - Access basic user information
 ```
 
 User Token Scopes:
 ```
-chat:write, im:write, users:read, users:read.email, channels:read,
-channels:write, groups:write, mpim:write
+chat:write    - Send messages as a user
+im:write      - Send direct messages
 ```
 
-After installing the app to your workspace, copy the Bot User OAuth Token for later use.
-
 #### Interactive Components
-The integration uses two main components to handle user interactions:
+The integration uses two main components:
 
 1. Slash Command:
 Configure a new command at Features → Slash Commands:
@@ -120,8 +114,6 @@ For faster setup, create your app using our prepared manifest:
 2. Copy the contents of [slack-manifest.yaml](./slack-manifest.yaml) from this repository
 3. Replace `YOUR_DOMAIN` in the manifest with your actual deployment URL
 4. Paste the modified manifest and create your app
-
-
 
 ### 4. Deploy the Bot
 
@@ -191,7 +183,6 @@ Testing in Slack is straightforward:
 4. Submit the form
 5. Check your DMs for the confirmation message with the OpsGenie link
 
-
 Incidents are mapped to OpsGenie priorities as follows:
 
 | Modal Selection | OpsGenie Priority |
@@ -200,8 +191,6 @@ Incidents are mapped to OpsGenie priorities as follows:
 | High           | P2               |
 | Medium         | P3               |
 | Low            | P4               |
-
-
 
 #### Development Testing
 
@@ -226,7 +215,6 @@ The test script performs these checks:
 - Tests interactivity endpoint
 - Validates Slack signatures
 - Checks OpsGenie API connectivity
-
 
 ## Need Help?
 - Open an issue in the repository
