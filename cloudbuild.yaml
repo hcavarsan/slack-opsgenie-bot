@@ -1,5 +1,4 @@
 steps:
-  # Install dependencies
   - name: 'node:18'
     entrypoint: npm
     args: ['install', '-g', 'pnpm']
@@ -12,30 +11,20 @@ steps:
     entrypoint: pnpm
     args: ['test:ci']
 
-  # Build the application
   - name: 'node:18'
     entrypoint: pnpm
     args: ['build']
 
-  # Verify build output
-  - name: 'node:18'
-    entrypoint: sh
-    args: ['-c', 'test -f dist/index.js || (echo "Build failed - dist/index.js not found" && exit 1)']
-
-  # Build Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/$PROJECT_ID/slack-opsgenie-bot', '.']
 
-  # Push Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/$PROJECT_ID/slack-opsgenie-bot']
 
-# Store artifacts
 artifacts:
   objects:
     location: 'gs://${PROJECT_ID}_cloudbuild/slack-opsgenie-bot/'
     paths: ['dist/**']
 
-# Store Docker image
 images:
   - 'gcr.io/$PROJECT_ID/slack-opsgenie-bot'

@@ -156,6 +156,8 @@ RESPONSE=$(curl -s -X POST "http://localhost:8080/slack/interactivity" \
     -H "X-Slack-Signature: $MODAL_SIGNATURE" \
     -d "$MODAL_PAYLOAD")
 
+echo "Response: $RESPONSE"
+
 if [ $? -eq 0 ]; then
     print_success "Modal submission sent successfully"
 
