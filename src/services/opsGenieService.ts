@@ -125,7 +125,7 @@ export class OpsGenieService {
       const result = {
         ...response.data,
         alias: alertData.alias,
-        url: `https://${process.env.OPSGENIE_DOMAIN || 'kftray'}.app.opsgenie.com/alert/detail/${alertData.alias}/details`
+        url: `https://${process.env.OPSGENIE_DOMAIN || 'app'}.app.opsgenie.com/alert/detail/${alertData.alias}/details`
       };
 
       // Try to get additional details with retries
@@ -147,7 +147,7 @@ export class OpsGenieService {
 
           if (alertDetails.data?.data?.[0]?.id) {
             result.id = alertDetails.data.data[0].id;
-            result.url = `https://${process.env.OPSGENIE_DOMAIN || 'kftray'}.app.opsgenie.com/alert/detail/${result.id}/details`;
+            result.url = `https://${process.env.OPSGENIE_DOMAIN || 'app'}.app.opsgenie.com/alert/detail/${result.id}/details`;
             break;
           }
         } catch (detailsError) {

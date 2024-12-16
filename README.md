@@ -10,10 +10,10 @@ You'll need to gather these credentials in the setup process:
 # Slack Configuration
 SLACK_API_URL: "https://slack.com/api"        # Default Slack API URL
 SLACK_SIGNING_SECRET: "xxx..."                # From Slack App Basic Information
-SLACK_BOT_TOKEN: "xoxb-xxx..."               # From Slack App OAuth & Permissions
+SLACK_BOT_TOKEN: "xoxb-xxx..."               # From Slack App OAuth & Permissions - Starts with xoxb-
 
 # OpsGenie Configuration
-OPSGENIE_DOMAIN: "your-domain"               # Your OpsGenie domain (e.g., kftray)
+OPSGENIE_DOMAIN: "your-domain"               # Your OpsGenie domain
 OPSGENIE_API_KEY: "xxxxxxxx-xxxx-xxxx-xxxx"  # From OpsGenie API Integration
 OPSGENIE_TEAM_ID: "xxxxxxxx-xxxx-xxxx-xxxx"  # From OpsGenie Team URL
 ```
