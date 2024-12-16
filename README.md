@@ -15,25 +15,63 @@ Before starting, ensure you have:
 ## Setup Guide
 
 ### 1. OpsGenie Configuration
-1. Go to OpsGenie → Teams → Settings → Integrations
-2. Enable Integration
-2. Create new API integration Key
-3. Note down:
+
+#### Create API Integration
+1. Log into your OpsGenie account at https://app.opsgenie.com
+2. Navigate to **Teams** → Select your team
+3. Click **Integrations** tab at the top
+4. Click **Add Integration** button
+5. In the search box, type "API" and select **API Integration**
+6. Configure the integration:
+   - Name: `Slack Incident Bot`
+   - Description: `Integration for Slack incident management`
+   - Enabled: ✅ Check this box
+   - Read Access: ✅ Check this box
+   - Write Access: ✅ Check this box
+   - Configure Access: ✅ Check this box
+7. Click **Save Integration**
+8. **Important**: Copy the generated API Key immediately (it looks like a UUID)
+
+#### Enable Team Integration
+1. Stay in your team settings
+2. Note your **Team ID** from the URL:
+   ```
+   https://app.opsgenie.com/teams/YOUR_TEAM_ID_HERE/dashboard
+   ```
+3. Go to **Settings** → **Integrations**
+4. Find your newly created API integration
+5. Ensure the following are enabled:
+   - Integration is active (toggle switch is green)
+   - Create and Update Access
+   - Delete Access
+   - Disable Access
+6. Note down:
    ```bash
-   OPSGENIE_API_KEY=      # From the integration settings
-   OPSGENIE_TEAM_ID=      # From Teams → Your Team → Team ID
-   OPSGENIE_DOMAIN=       # Your OpsGenie domain
+   OPSGENIE_API_KEY=      # Your copied API key
+   OPSGENIE_TEAM_ID=      # Your team ID from URL
+   OPSGENIE_DOMAIN=       # Your OpsGenie domain (e.g., kftray)
    ```
 
 ### 2. Slack App Creation
+
+#### Create New App
 1. Go to [Slack API Apps](https://api.slack.com/apps)
-2. Click "Create New App" → "From Scratch"
-3. Name your app and select your workspace
-4. Under "Basic Information", copy:
+2. Click **Create New App** → **From Scratch**
+3. Enter details:
+   - App Name: `OpsGenie Incident Bot`
+   - Development Slack Workspace: [Select your workspace]
+4. Click **Create App**
+
+#### Basic Information Setup
+1. Under **Settings** → **Basic Information**:
+2. Copy the **Signing Secret** from "App Credentials":
    ```bash
-   SLACK_SIGNING_SECRET=  # From "App Credentials" section (xoxb-* token)
+   SLACK_SIGNING_SECRET=  # Copy this value
    ```
-5. Under "OAuth & Permissions":
+
+#### Configure Bot Permissions
+1. Go to **Features** → **OAuth & Permissions**
+2. Under **Scopes**:
    - Add these **Bot Token Scopes**:
      ```
      channels:read
@@ -58,16 +96,37 @@ Before starting, ensure you have:
      groups:write
      mpim:write
      ```
-   - Install app to workspace
-   - Copy:
-     ```bash
-     SLACK_BOT_TOKEN=     # Bot User OAuth Token
-     ```
+3. Click **Install to Workspace**
+4. Authorize the app
+5. Copy the **Bot User OAuth Token**:
+   ```bash
+   SLACK_BOT_TOKEN=     # Starts with xoxb-
+   ```
+
+#### Configure Slash Command
+1. Go to **Features** → **Slash Commands**
+2. Click **Create New Command**
+3. Fill in the details:
+   ```
+   Command: /create-incident
+   Request URL: https://your-domain.com/slack/commands
+   Short Description: Create an OpsGenie incident
+   Usage Hint: [title] [description] [priority]
+   ```
+4. Click **Save**
+
+#### Enable Interactivity
+1. Go to **Features** → **Interactivity & Shortcuts**
+2. Toggle **Interactivity** to On
+3. Add Request URL:
+   ```
+   https://your-domain.com/slack/interactivity
+   ```
+4. Click **Save Changes**
 
 ### 3. Environment Configuration
 
 Create the `.env.yaml` file with the following content:
-
 
 ```yaml
 OPSGENIE_API_KEY: "your-api-key"

@@ -192,7 +192,7 @@ export class OpsGenieService {
 
     const details = isResolved
       ? `Start Time: ${title}\nEnd Time: ${description}\nRoot Cause: ${urgency}`
-      : `Start Time: ${title}\nExpected Resolution: ${description}\nCause: ${urgency}`;
+      : `Start Time: ${title}\nDescription: ${description}\nCause: ${urgency}`;
 
     return `${header}\n\n${reporter}\n${location}\n${timeInfo}\n\n${details}`;
   }
