@@ -2,6 +2,10 @@
 
 Create OpsGenie alerts directly from Slack using a simple slash command. This integration allows teams to quickly create incidents through Slack.
 
+## Why This Bot?
+
+This bot addresses a key limitation in OpsGenie's native Slack integration: the requirement for individual OpsGenie user accounts. Using a single service account, any Slack user can create incidents while the bot handles the automatic capture of user context, channel details, and team information. This reduces license costs and simplifies access management without sacrificing incident tracking capabilities.
+
 ## Required Environment Variables
 
 You'll need to gather these credentials in the setup process:
