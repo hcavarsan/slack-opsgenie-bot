@@ -8,22 +8,6 @@ Create OpsGenie alerts directly from Slack using a simple slash command. This in
 
 This bot addresses a key limitation in OpsGenie's native Slack integration: the requirement for individual OpsGenie user accounts and need to login to OpsGenie in Slack to create incidents. Using a single bot (api key), any Slack user can create incidents while the bot handles the automatic capture of user context, channel details, and team information. This reduces license costs and simplifies access management without sacrificing incident tracking capabilities.
 
-## Required Environment Variables
-
-You'll need to gather these credentials in the setup process:
-
-```yaml
-# Slack Configuration
-SLACK_API_URL: "https://slack.com/api"        # Default Slack API URL
-SLACK_SIGNING_SECRET: "xxx..."                # From Slack App Basic Information
-SLACK_BOT_TOKEN: "xoxb-xxx..."               # From Slack App OAuth & Permissions - Starts with xoxb-
-
-# OpsGenie Configuration
-OPSGENIE_DOMAIN: "your-domain"               # Your OpsGenie domain
-OPSGENIE_API_KEY: "xxxxxxxx-xxxx-xxxx-xxxx"  # From OpsGenie API Integration
-OPSGENIE_TEAM_ID: "xxxxxxxx-xxxx-xxxx-xxxx"  # From OpsGenie Team URL
-```
-
 ## Prerequisites
 
 ### Required Accounts & Permissions
@@ -133,14 +117,18 @@ cp .env.yaml.example .env.yaml
 # Edit .env.yaml with your credentials
 ```
 
-After creating the file, you can edit it with your information:
+After creating the file, you need to replace the values with your actual information:
 
 ```yaml
-OPSGENIE_API_KEY: "your-api-key"
-OPSGENIE_TEAM_ID: "your-team-id"
-OPSGENIE_DOMAIN: "your-domain"
-SLACK_SIGNING_SECRET: "your-signing-secret"
-SLACK_BOT_TOKEN: "xoxb-your-bot-token"
+# Slack Configuration
+SLACK_API_URL: "https://slack.com/api"        # Default Slack API URL
+SLACK_SIGNING_SECRET: "xxx..."                # From Slack App Basic Information
+SLACK_BOT_TOKEN: "xoxb-xxx..."               # From Slack App OAuth & Permissions - Starts with xoxb-
+
+# OpsGenie Configuration
+OPSGENIE_DOMAIN: "your-domain"               # Your OpsGenie domain
+OPSGENIE_API_KEY: "xxxxxxxx-xxxx-xxxx-xxxx"  # From OpsGenie API Integration
+OPSGENIE_TEAM_ID: "xxxxxxxx-xxxx-xxxx-xxxx"  # From OpsGenie Team URL
 ```
 
 Build and run the container:
@@ -152,6 +140,8 @@ pnpm docker:run
 Your deployment will be available at `http://localhost:8080`, now you can use something like [ngrok](https://ngrok.com/) to test the integration in Slack using the public URL.
 
 #### Using Google Cloud Functions
+
+Another option is to deploy the bot to Google Cloud Functions. This is a more scalable and cost-effective solution, but it requires a Google Cloud account.
 
 Deploy to Google Cloud with a single command:
 ```bash
