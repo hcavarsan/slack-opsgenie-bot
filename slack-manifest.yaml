@@ -1,0 +1,41 @@
+display_information:
+  name: OpsGenie Incident Bot
+features:
+  bot_user:
+    display_name: opsgenie-bot
+    always_online: false
+  slash_commands:
+    - command: /create-incident
+      url: https://YOUR_DOMAIN/slack/commands
+      description: Create an OpsGenie incident
+      usage_hint: "[title] [description] [priority]"
+      should_escape: false
+oauth_config:
+  scopes:
+    user:
+      - chat:write
+      - im:write
+      - users:read
+      - users:read.email
+      - channels:read
+      - channels:write
+      - groups:write
+      - mpim:write
+    bot:
+      - channels:read
+      - chat:write
+      - commands
+      - im:write
+      - users:read
+      - users:read.email
+      - channels:manage
+      - groups:write
+      - mpim:write
+      - incoming-webhook
+settings:
+  interactivity:
+    is_enabled: true
+    request_url: https://YOUR_DOMAIN/slack/interactivity
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false

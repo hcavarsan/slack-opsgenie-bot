@@ -1,132 +1,140 @@
 # Slack OpsGenie Integration
 
-Create OpsGenie alerts directly from Slack using a simple slash command.
+Create OpsGenie alerts directly from Slack using a simple slash command. This integration allows teams to quickly create incidents through Slack.
+
+## Required Environment Variables
+
+You'll need to gather these credentials in the setup process:
+
+```yaml
+# Slack Configuration
+SLACK_API_URL: "https://slack.com/api"        # Default Slack API URL
+SLACK_SIGNING_SECRET: "xxx..."                # From Slack App Basic Information
+SLACK_BOT_TOKEN: "xoxb-xxx..."               # From Slack App OAuth & Permissions
+
+# OpsGenie Configuration
+OPSGENIE_DOMAIN: "your-domain"               # Your OpsGenie domain (e.g., kftray)
+OPSGENIE_API_KEY: "xxxxxxxx-xxxx-xxxx-xxxx"  # From OpsGenie API Integration
+OPSGENIE_TEAM_ID: "xxxxxxxx-xxxx-xxxx-xxxx"  # From OpsGenie Team URL
+```
 
 ## Prerequisites
 
-Before starting, ensure you have:
-- An OpsGenie account
-- A Slack workspace with admin access
-- Node.js 18+ installed
-- pnpm installed
-- Docker installed (recommended) or Google Cloud account
-- jq installed (for local testing)
+### Required Accounts & Permissions
+- OpsGenie Account with:
+  - Admin access to create integrations
+  - Team management permissions
+  - Ability to create API keys
+- Slack Workspace with:
+  - Admin access to create apps
+  - Permission to install apps to workspace
+  - Ability to create slash commands
+
+### Development Environment
+- Node.js 18 or higher
+- pnpm package manager
+- Docker (recommended for local development)
+- jq utility (for local testing)
+
+### Optional Requirements
+- Google Cloud account (for cloud deployment)
+- ngrok (for local development with Slack)
 
 ## Setup Guide
 
 ### 1. OpsGenie Configuration
 
 #### Create API Integration
-1. Log into your OpsGenie account at https://app.opsgenie.com
-2. Navigate to **Teams** → Select your team
-3. Click **Integrations** tab at the top
-4. Click **Add Integration** button
-5. In the search box, type "API" and select **API Integration**
-6. Configure the integration:
-   - Name: `Slack Incident Bot`
-   - Description: `Integration for Slack incident management`
-   - Enabled: ✅ Check this box
-   - Read Access: ✅ Check this box
-   - Write Access: ✅ Check this box
-   - Configure Access: ✅ Check this box
-7. Click **Save Integration**
-8. **Important**: Copy the generated API Key immediately (it looks like a UUID)
+Start by setting up an API integration in OpsGenie that will allow secure communication between the services.
 
-#### Enable Team Integration
-1. Stay in your team settings
-2. Note your **Team ID** from the URL:
-   ```
-   https://app.opsgenie.com/teams/YOUR_TEAM_ID_HERE/dashboard
-   ```
-3. Go to **Settings** → **Integrations**
-4. Find your newly created API integration
-5. Ensure the following are enabled:
-   - Integration is active (toggle switch is green)
-   - Create and Update Access
-   - Delete Access
-   - Disable Access
-6. Note down:
-   ```bash
-   OPSGENIE_API_KEY=      # Your copied API key
-   OPSGENIE_TEAM_ID=      # Your team ID from URL
-   OPSGENIE_DOMAIN=       # Your OpsGenie domain (e.g., kftray)
-   ```
+Navigation Steps:
+1. Log into OpsGenie at https://app.opsgenie.com
+2. Go to: Teams → Your Team → Integrations tab
+3. Click "Add Integration"
+4. Search for and select "API Integration"
+
+Required Permissions:
+- ✅ Read Access (for retrieving incidents)
+- ✅ Write Access (for creating/updating incidents)
+- ✅ Configure Access (for integration management)
+
 
 ### 2. Slack App Creation
 
-#### Create New App
-1. Go to [Slack API Apps](https://api.slack.com/apps)
-2. Click **Create New App** → **From Scratch**
-3. Enter details:
-   - App Name: `OpsGenie Incident Bot`
-   - Development Slack Workspace: [Select your workspace]
-4. Click **Create App**
+The Slack integration consists of a custom app that provides the interface between your team and OpsGenie. You can create this app in two ways:
 
-#### Basic Information Setup
-1. Under **Settings** → **Basic Information**:
-2. Copy the **Signing Secret** from "App Credentials":
-   ```bash
-   SLACK_SIGNING_SECRET=  # Copy this value
-   ```
+#### Option 1: Manual Setup (UI-based)
 
-#### Configure Bot Permissions
-1. Go to **Features** → **OAuth & Permissions**
-2. Under **Scopes**:
-   - Add these **Bot Token Scopes**:
-     ```
-     channels:read
-     chat:write
-     commands
-     im:write
-     users:read
-     users:read.email
-     channels:manage
-     groups:write
-     mpim:write
-     incoming-webhook
-     ```
-   - Add these **User Token Scopes**:
-     ```
-     chat:write
-     im:write
-     users:read
-     users:read.email
-     channels:read
-     channels:write
-     groups:write
-     mpim:write
-     ```
-3. Click **Install to Workspace**
-4. Authorize the app
-5. Copy the **Bot User OAuth Token**:
-   ```bash
-   SLACK_BOT_TOKEN=     # Starts with xoxb-
-   ```
+The Slack integration consists of a custom app that provides the interface between your team and OpsGenie. Create this app at [Slack API Apps](https://api.slack.com/apps).
 
-#### Configure Slash Command
-1. Go to **Features** → **Slash Commands**
-2. Click **Create New Command**
-3. Fill in the details:
-   ```
-   Command: /create-incident
-   Request URL: https://your-domain.com/slack/commands
-   Short Description: Create an OpsGenie incident
-   Usage Hint: [title] [description] [priority]
-   ```
-4. Click **Save**
+Start by creating a new app from scratch, naming it "OpsGenie Incident Bot". This will be the interface your team uses to create  incidents.
 
-#### Enable Interactivity
-1. Go to **Features** → **Interactivity & Shortcuts**
-2. Toggle **Interactivity** to On
-3. Add Request URL:
-   ```
-   https://your-domain.com/slack/interactivity
-   ```
-4. Click **Save Changes**
+#### Security and Permissions
+Under the Basic Information section, you'll find your app's credentials. The Signing Secret is particularly important as it ensures secure communication between Slack and your integration.
 
-### 3. Environment Configuration
+Navigate to OAuth & Permissions to configure the bot's capabilities. The integration requires specific permissions to function properly:
 
-Create the `.env.yaml` file with the following content:
+Bot Token Scopes:
+```
+channels:read, chat:write, commands, im:write, users:read,
+users:read.email, channels:manage, groups:write, mpim:write, incoming-webhook
+```
+
+User Token Scopes:
+```
+chat:write, im:write, users:read, users:read.email, channels:read,
+channels:write, groups:write, mpim:write
+```
+
+After installing the app to your workspace, copy the Bot User OAuth Token for later use.
+
+#### Interactive Components
+The integration uses two main components to handle user interactions:
+
+1. Slash Command:
+Configure a new command at Features → Slash Commands:
+```
+Command: /create-incident
+Request URL: https://your-domain.com/slack/commands
+Description: Create an OpsGenie incident
+```
+
+2. Interactive Messages:
+Enable interactivity and set the request URL:
+```
+https://your-domain.com/slack/interactivity
+```
+
+#### Option 2: App Manifest
+
+For faster setup, create your app using our prepared manifest:
+
+1. Go to [Slack API Apps](https://api.slack.com/apps) → **Create New App** → **From an app manifest**
+2. Copy the contents of [slack-manifest.yaml](./slack-manifest.yaml) from this repository
+3. Replace `YOUR_DOMAIN` in the manifest with your actual deployment URL
+4. Paste the modified manifest and create your app
+
+
+
+### 4. Deploy the Bot
+
+#### Using Docker (Recommended)
+
+Clone and set up the project:
+```bash
+git clone https://github.com/hcavarsan/slack-opsgenie-bot
+cd slack-opsgenie-bot
+pnpm install
+```
+
+Create a `.env.yaml` file to store your configuration:
+
+```bash
+cp .env.yaml.example .env.yaml
+# Edit .env.yaml with your credentials
+```
+
+After creating the file, you can edit it with your information:
 
 ```yaml
 OPSGENIE_API_KEY: "your-api-key"
@@ -136,28 +144,18 @@ SLACK_SIGNING_SECRET: "your-signing-secret"
 SLACK_BOT_TOKEN: "xoxb-your-bot-token"
 ```
 
-### 4. Deploy the Bot
-
-#### Using Docker (Recommended)
+Build and run the container:
 ```bash
-# Clone and install
-git clone https://github.com/hcavarsan/slack-opsgenie-bot
-cd slack-opsgenie-bot
-pnpm install
-
-# Add your credentials to .env.yaml file
-cp .env.yaml.example .env.yaml
-
-# Build and run
 pnpm docker:build
 pnpm docker:run
-# Note your deployment URL: http://localhost:8080
 ```
 
-#### Using Google Cloud Functions
-```bash
+Your deployment will be available at `http://localhost:8080`, now you can use something like [ngrok](https://ngrok.com/) to test the integration in Slack using the public URL.
 
-# Deploy
+#### Using Google Cloud Functions
+
+Deploy to Google Cloud with a single command:
+```bash
 gcloud functions deploy slack-opsgenie-bot \
   --gen2 \
   --runtime=nodejs18 \
@@ -167,54 +165,27 @@ gcloud functions deploy slack-opsgenie-bot \
   --trigger-http \
   --allow-unauthenticated \
   --env-vars-file .env.yaml
-
-# Note your deployment URL from the output
 ```
+
+After deployment, note the function URL from the output - you'll need it for your Slack app configuration.
 
 ### 5. Test the Integration
 
-#### A. Using Slack (Production)
-1. In any Slack channel, type:
-   ```
-   /$SLASH_COMMAND_NAME
-   ```
-2. Fill in the incident details in the modal
-3. Submit to create an OpsGenie alert
-4. Check your direct messages for the confirmation and OpsGenie link
+#### Production Testing in Slack
 
-#### B. Local Testing (Development)
+Testing in Slack is straightforward:
 
-1. Build and run the Docker container:
-```bash
-# Build the image
-pnpm docker:build
+1. Open any Slack channel where the bot is installed
+2. Type `/create-incident`
+3. Fill out the incident form:
+   - Title: Brief description of the incident
+   - Description: Detailed information
+   - Priority: Select from Critical to Low
+4. Submit the form
+5. Check your DMs for the confirmation message with the OpsGenie link
 
-# Run in development mode
-pnpm docker:run
-```
 
-2. In a new terminal, run the test script:
-```bash
-chmod +x scripts/test-local.sh
-./scripts/test-local.sh
-```
-
-The script will:
-1. Load your environment variables automatically
-2. Test both the slash command and interactivity endpoints
-3. Generate valid signatures using your actual Slack credentials
-4. Show the responses from both endpoints
-5. Display a pretty summary with test results and OpsGenie status
-
-Requirements:
-- Docker container running locally
-- Valid `.env.yaml` file with credentials
-- `curl` installed on your system
-- `jq` installed for JSON parsing
-
-### Priority Mapping
-
-The incident priorities map to OpsGenie priorities as follows:
+Incidents are mapped to OpsGenie priorities as follows:
 
 | Modal Selection | OpsGenie Priority |
 |----------------|-------------------|
@@ -223,6 +194,31 @@ The incident priorities map to OpsGenie priorities as follows:
 | Medium         | P3               |
 | Low            | P4               |
 
+
+
+#### Development Testing
+
+Start the development environment:
+```bash
+# Build the Docker image
+pnpm docker:build
+
+# Run in development mode
+pnpm docker:run
+```
+
+Run the test script:
+```bash
+chmod +x scripts/test-local.sh
+./scripts/test-local.sh
+```
+
+The test script performs these checks:
+- Loads environment variables
+- Tests slash command endpoint
+- Tests interactivity endpoint
+- Validates Slack signatures
+- Checks OpsGenie API connectivity
 
 
 ## Need Help?
