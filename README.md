@@ -1,4 +1,4 @@
-# Slack OpsGenie Integration (Go Version)
+# Slack OpsGenie Integration Bot
 
 ![demo 5](https://github.com/user-attachments/assets/faa6d2c8-eeee-4fbf-a942-53584d3b5e2c)
 
